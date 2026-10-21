@@ -2,7 +2,7 @@ require_relative 'board'
 require_relative 'player'
 
 class Game
-    attr_accessor :turn_count, :game_on, :human_code_breaker, :total
+    attr_accessor :turn_num, :game_on, :human_code_breaker, :total
 
     def initialize(val,player,board)
         @turn_num = 1
@@ -14,9 +14,9 @@ class Game
     end
 
     def get_player_input
-            puts "Turn #{@turn_num}: #{@total - @turn_num} more attempts.. "
+            puts "Turn #{@turn_num}: #{@total - @turn_num + 1} more attempts.. "
             puts "enter numbers one after the other:"
-            guess = gets.chomp
+            guess = gets.chomp.chars.map(&:to_i)
             @turn_num += 1
             guess
     end
@@ -32,15 +32,16 @@ class Game
     end
 
     def check_game_end
-        if @turn_num == @total
+        if @turn_num > @total
             @game_on = false
-            puts "Game Over..;("
+            puts "Game Over..;( The code was: #{@board.code}"
         end
     end
 
     def game_start
         if @human_code_breaker
             while @game_on
+                
                 guess = get_player_input()
                 compare_guess(guess)
                 check_game_end()
@@ -53,9 +54,11 @@ class Game
 end
 
 
-
-player = Player.new("Breaker", "Bob")
-code = player.make_code()
-board = Board.new(code)
-game = Game.new(true, player, board)
-game.game_start()
+if __FILE__ == $0
+    player = Player.new("Breaker", "Bob")
+    player2 = Player.new()
+    code = player2.make_code()
+    board = Board.new(code)
+    game = Game.new(true, player, board)
+    game.game_start()
+end

@@ -7,7 +7,7 @@
 class Player
     attr_accessor :name, :role, :code
 
-    def initialize(role, name= "computer" )
+    def initialize(role= "Maker", name= "computer" )
         @name = name
         @role =  role
         @code = []
@@ -21,7 +21,7 @@ class Player
         4.times do |i|
             @code[i] = rand(0..9)
         end
-
+        @code
     end
 
     def break_code
