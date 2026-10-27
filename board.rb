@@ -1,55 +1,63 @@
-require_relative 'player'
-
 class Board
     attr_accessor :history, :code
-    
+
     def initialize(code)
-        @history = {}
+        @history = []
         @code = code
     end
 
-    def give_hint(guess)
+    # returns [exact, partial] for a guess against a code
+    def self.score(guess, code)
+        exact = 0
+        code_left = []
+        guess_left = []
 
-        hints = []
-     
-        guess.each_with_index do |g, index_g|
-            @code.each_with_index do |c, index_c|
-                if g == c
-                    if index_g == index_c
-                        hints << "Complete"
-                    else
-                        hints << "Partial"
-                    end
-                else
-                    hints << "Wrong"
-                end
+        # pass 1: exact matches (right digit, right place)
+        guess.each_with_index do |g, i|
+            if g == code[i]
+                exact += 1
+            else
+                code_left << code[i]
+                guess_left << g
             end
         end
-        hints
+
+        # pass 2: right digit, wrong place, using each code digit at most once
+        partial = 0
+        guess_left.each do |g|
+            idx = code_left.index(g)
+            if idx
+                partial += 1
+                code_left.delete_at(idx)
+            end
+        end
+
+        [exact, partial]
+    end
+
+    def give_hint(guess)
+        exact, partial = Board.score(guess, @code)
+        ["Complete"] * exact + ["Partial"] * partial
     end
 
     def show_history(guess)
-        hint = give_hint(guess)
-        @history[guess] = hint
+        @history << [guess, give_hint(guess)]
         puts "=============HINTS BOARD=================="
-        @history.each do |k,v|
-            puts "#{k}=> #{v}"
+        @history.each do |g, hint|
+            puts "#{g.join}=> #{hint}"
         end
         puts "=========================================="
     end
 
-    def record_history(guess, hint)
-    end
-
     def compare_guess(guess)
         show_history(guess)
-        
+
         if @code == guess
-            puts "Bravo! you cracked the code! it was indeed #{code}"
+            puts "Bravo! the code was cracked! it was indeed #{code.join}"
             return true
         end
 
+        false
     end
 
 end
-    
